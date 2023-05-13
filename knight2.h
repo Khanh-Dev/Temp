@@ -26,6 +26,7 @@ public:
     virtual bool insertFirst(BaseItem * item);
     virtual BaseItem * get(ItemType itemType);
     virtual string toString() const;
+
 };
 
 class BagPaladin : public BaseBag {
@@ -40,12 +41,14 @@ class BagLanceLot : public BaseBag {
 
 class BagDragon : public BaseBag {
     public:
-        BagDragon(int phoenixdownI);   
+        BagDragon(int phoenixdownI);
+   
 };
 
 class BagNormal : public BaseBag {
     public:
-        BagNormal(int phoenixdownI, int antidote);     
+        BagNormal(int phoenixdownI, int antidote);
+        
 };
 
 class BaseOpponent {
