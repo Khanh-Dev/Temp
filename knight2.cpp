@@ -1,6 +1,131 @@
 #include "knight2.h"
 
 /* * * BEGIN implementation of class BaseBag * * */
+BaseBag::insertFirst(BaseItem * item) {
+    bool result = false;
+    if (bag_num_now < max_bag || max_bag == 999) {
+        result = true;
+    }
+    if (item->item == Antidotex && bag_knight->getType() == DRAGON) {
+        result = false;
+    }
+
+    return result;
+}
+
+class PhoenixDownI : public BaseItem {
+    public:
+        PhoenixDownI():BaseItem(){item = PhoenixDownIx;}
+        bool canUse( BaseKnight * knight ) {
+            if (knight->getHp() <= 0 ) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        void use ( BaseKnight * knight ) {
+            int temp_maxHP = knight->getMaxHp();
+            knight->setHp(temp_maxHP);
+        }
+
+};
+
+class PhoenixDownII : public BaseItem {
+    public:
+        PhoenixDownII() {item = PhoenixDownIIx;}
+        bool canUse( BaseKnight * knight ) {
+            int temp_maxHP = knight->getMaxHp();
+            int temp_nowHP = knight->getHp();
+            if (temp_nowHP < temp_maxHP/4) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        void use ( BaseKnight * knight ) {
+            int temp_maxHP = knight->getMaxHp();
+            knight->setHp(temp_maxHP);
+        }
+
+};
+
+class PhoenixDownIII : public BaseItem {
+    public:
+        PhoenixDownIII() {item = PhoenixDownIIIx;}
+        bool canUse( BaseKnight * knight ) {
+            int temp_maxHP = knight->getMaxHp();
+            int temp_nowHP = knight->getHp();
+            if (temp_nowHP < temp_maxHP/3) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        void use ( BaseKnight * knight ) {
+            int temp_maxHP = knight->getMaxHp();
+            int temp_nowHP = knight->getHp();
+            if (temp_nowHP <= 0) {
+                knight->setHp(temp_maxHP/3);
+            }
+            else {
+                knight->setHp(temp_nowHP + temp_maxHP/4);
+            }
+
+        }
+
+};
+
+class PhoenixDownIV : public BaseItem {
+    public:
+        PhoenixDownIV() {item = PhoenixDownIVx;}
+        bool canUse( BaseKnight * knight ) {
+            int temp_maxHP = knight->getMaxHp();
+            int temp_nowHP = knight->getHp();
+            if (temp_nowHP < temp_maxHP/2) {
+                return true;
+            }
+            else {
+                return false;
+            }            
+        }
+
+        void use ( BaseKnight * knight ) {
+            int temp_maxHP = knight->getMaxHp();
+            int temp_nowHP = knight->getHp();
+            
+            if (temp_nowHP <= 0) {
+                knight->setHp(temp_maxHP/2);
+            }
+            else {
+                knight->setHp(temp_nowHP + temp_maxHP/5);
+            }
+        }
+
+};
+
+BagPaladin::BagPaladin(int phoenixdownI, int antidote) {
+    for (int q = 0; q < phoenixdownI; q++) {
+        BaseItem* abc = new PhoenixDownI();
+        abc->after = head;
+        head = abc;  
+    }
+
+    for (int i = 0; i < antidote; i++) {
+        BaseItem* abc = new Antidote();
+        abc->after = head;
+        head = abc;
+    }
+
+    bag_num_now = phoenixdownI + antidote;
+    max_bag = 999; 
+}
+
 
 /* * * END implementation of class BaseBag * * */
 

@@ -17,13 +17,35 @@ enum ItemType {Antidotex = 0, PhoenixDownIx, PhoenixDownIIx, PhoenixDownIIIx, Ph
 
 class BaseBag {
 protected:
+    BaseKnight* bag_knight;
     BaseItem* head = nullptr;
     int bag_num_now = 0;
-    
+    int max_bag;
+
 public:
     virtual bool insertFirst(BaseItem * item);
     virtual BaseItem * get(ItemType itemType);
     virtual string toString() const;
+};
+
+class BagPaladin : public BaseBag {
+    public:
+        BagPaladin(int phoenixdownI, int antidote);      
+};
+
+class BagLanceLot : public BaseBag {
+    public:
+        BagLanceLot(int phoenixdownI, int antidote);     
+};
+
+class BagDragon : public BaseBag {
+    public:
+        BagDragon(int phoenixdownI);   
+};
+
+class BagNormal : public BaseBag {
+    public:
+        BagNormal(int phoenixdownI, int antidote);     
 };
 
 class BaseOpponent {
@@ -35,6 +57,8 @@ class BaseOpponent {
         int eventID;
     public:
         static BaseOpponent *create(int id, int eventID);
+
+        virtual bool fight(BaseKnight *knight);
 
         int getId() const {
             return id;
@@ -54,6 +78,56 @@ class BaseOpponent {
         }
 
 };
+
+class MadBear : public BaseOpponent {
+    MadBear(int id, int eventID);
+    bool fight(BaseKnight *knight);
+};
+class Bandit : public BaseOpponent {
+    Bandit(int id, int eventID);
+    bool fight(BaseKnight *knight);
+};
+
+class LordLupin : public BaseOpponent {
+    LordLupin(int id, int eventID);
+    bool fight(BaseKnight *knight);
+};
+class Elf : public BaseOpponent {
+    Elf(int id, int eventID);
+    bool fight(BaseKnight *knight);
+};
+
+class Troll : public BaseOpponent {
+    Troll(int id, int eventID);
+    bool fight(BaseKnight *knight);
+};
+class TornBey : public BaseOpponent {
+    TornBey(int id, int eventID);
+    bool fight(BaseKnight *knight);
+};
+
+class QueenOfCards : public BaseOpponent {
+    QueenOfCards(int id, int eventID);
+    bool fight(BaseKnight *knight);
+};
+class NinaDeRings : public BaseOpponent {
+    NinaDeRings(int id, int eventID);
+    bool fight(BaseKnight *knight);
+};
+class DurianGarden : public BaseOpponent {
+    DurianGarden(int id, int eventID);
+    bool fight(BaseKnight *knight);
+};
+class OmegaWeapon : public BaseOpponent {
+    OmegaWeapon(int id, int eventID);
+    bool fight(BaseKnight *knight);
+};
+class Hades : public BaseOpponent {
+    Hades(int id, int eventID);
+    bool fight(BaseKnight *knight);
+};
+
+
 
 enum KnightType { PALADIN = 0, LANCELOT, DRAGON, NORMAL };
 class BaseKnight {
@@ -129,7 +203,22 @@ public:
     }
 };
 
-
+class PaladinKnight : public BaseKnight {
+    public:
+        PaladinKnight(int id, int maxhp, int level, int gil, int antidote, int phoenixdownI);
+};
+class LancelotKnight : public BaseKnight {
+    public:
+        LancelotKnight(int id, int maxhp, int level, int gil, int antidote, int phoenixdownI);
+};
+class DragonKnight : public BaseKnight {
+    public:
+        DragonKnight(int id, int maxhp, int level, int gil, int antidote, int phoenixdownI);
+};
+class NormalKnight : public BaseKnight {
+    public:
+        NormalKnight(int id, int maxhp, int level, int gil, int antidote, int phoenixdownI);
+};
 
 class ArmyKnights {
 protected:
@@ -191,23 +280,13 @@ public:
     virtual void use ( BaseKnight * knight ) = 0;
 };
 
+
 class Events {
 private:
     int num_event;        //Khai bao can thiet 
     int *arr_event;
 public:
-    Events(const string & file_events) {            //cap phat mang dong voi num phan tu, dua gia tri hang 2 cua file event vao mang vua khoi tao
-        ifstream events_work;
-        events_work.open(file_events);
-        events_work >> num_event;
-
-        arr_event = new int[num_event];
-        for (int i = 0; i < num_event; i++) {
-            events_work >> arr_event[i];
-        }
-
-        events_work.close();
-    }
+    Events(const string & file_events);
 
     int count() const {     //Tra ve so luong su kien
         return num_event;
