@@ -31,6 +31,10 @@ public:
     virtual string toString() const;
     friend class TornBery;
 
+    BaseItem* getHead() {
+        return head;
+    }
+
 
 };
 
@@ -63,10 +67,13 @@ class BaseOpponent {
         int gil;
         int baseDamage;
         int eventID;
+        bool ren_kiem = false;
     public:
         static BaseOpponent *create(int id, int eventID);
 
         virtual bool fight(BaseKnight *knight);
+        //void hoi_mau(BaseKnight *knight);
+        //void increaseLevel(BaseKnight *knight);
 
         int getId() const {
             return id;
@@ -253,13 +260,18 @@ protected:
     bool meet_hades = false;
 public:
     ArmyKnights (const string & file_armyknights);
-    ~ArmyKnights() {
-        delete[] arr_armyknight;
-    }
+    ~ArmyKnights();
     bool fight(BaseOpponent * opponent);
     bool adventure (Events * events);
     int count() const;
-    BaseKnight * lastKnight() const;
+    BaseKnight * lastKnight() const {
+        if (num_armyknight == 0) {
+            return NULL;
+        }
+        else {
+            return arr_armyknight[num_armyknight-1];
+        }
+    };
 
     //Ve khien cua Paladin
     void setShield(bool shield) {
@@ -307,16 +319,10 @@ private:
 public:
     Events(const string & file_events);
 
-    int count() const {     //Tra ve so luong su kien
-        return num_event;
-    };
-    int get(int i) const {     //Tra ve gia tri thu i cua mang
-        return arr_event[i];
-    };
+    int count() const;
+    int get(int i) const;
 
-    ~Events() {                 //Destructor tra lai bo nho cho he dieu hanh khi khong con dung toi
-        delete[] arr_event;
-    }
+    ~Events();
 };
 
 class KnightAdventure {

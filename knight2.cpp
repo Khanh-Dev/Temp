@@ -281,6 +281,32 @@ void increaseLevel(BaseKnight *knight) {
     }
 }
 
+void hoi_mau(BaseKnight *knight) {
+    if (knight->getHp() <= 0) {
+        BaseItem *temp = knight->getBag()->getHead();               
+
+        while (temp != NULL) {
+            if ( temp->canUse( knight ) ) {         //Khi duyet tui do neu vat pham do dung duoc
+                temp = knight->getBag()->get(temp->item);
+                temp->use( knight );
+
+                //Xoa di item do, chua hoan thien
+                break;      //Thoat vong duyet tui do
+            }
+            else {
+                temp = temp->after;             //Di den vat pham ke tiep trong tui do
+            }
+        }
+
+        if ( knight->getHp() <= 0 ) {     //Tim het tui do nhung HP van nho hon hoac bang 0
+            if ( knight->getGil() >= 100 ) {
+                knight->setHp( knight->getMaxHp()/2 );
+                knight->setGil( knight->getGil() - 100);
+            }
+        }
+    }
+}
+
 
 BaseOpponent *BaseOpponent::create(int id, int eventID) {
     if (eventID == 1) {
@@ -328,10 +354,17 @@ MadBear::MadBear(int id, int eventID) {
 
 bool MadBear::fight(BaseKnight *knight) {
     if ( knight->getType() == LANCELOT || knight->getType() == PALADIN || knight->getLevel() >= levelO ) {
+        knight->setGil( knight->getGil() + gil );
         return true;
     }
     else {
-        return false;
+        hoi_mau(knight);
+        if (knight->getHp() <= 0) {
+            return false;
+        }
+        else {
+            return true;
+        }
     }
 }
 
@@ -345,10 +378,17 @@ Bandit::Bandit(int id, int eventID) {
 
 bool Bandit::fight(BaseKnight *knight) {
     if ( knight->getType() == LANCELOT || knight->getType() == PALADIN || knight->getLevel() >= levelO ) {
+        knight->setGil( knight->getGil() + gil );
         return true;
     }
     else {
-        return false;
+        hoi_mau(knight);
+        if (knight->getHp() <= 0) {
+            return false;
+        }
+        else {
+            return true;
+        }
     }
 }
 
@@ -362,10 +402,17 @@ LordLupin::LordLupin(int id, int eventID) {
 
 bool LordLupin::fight(BaseKnight *knight) {
     if ( knight->getType() == LANCELOT || knight->getType() == PALADIN || knight->getLevel() >= levelO ) {
+        knight->setGil( knight->getGil() + gil );
         return true;
     }
     else {
-        return false;
+        hoi_mau(knight);
+        if (knight->getHp() <= 0) {
+            return false;
+        }
+        else {
+            return true;
+        }
     }
 }
 
@@ -379,10 +426,17 @@ Elf::Elf(int id, int eventID) {
 
 bool Elf::fight(BaseKnight *knight) {
     if ( knight->getType() == LANCELOT || knight->getType() == PALADIN || knight->getLevel() >= levelO ) {
+        knight->setGil( knight->getGil() + gil );
         return true;
     }
     else {
-        return false;
+        hoi_mau(knight);
+        if (knight->getHp() <= 0) {
+            return false;
+        }
+        else {
+            return true;
+        }
     }
 }
 
@@ -396,10 +450,17 @@ Troll::Troll(int id, int eventID) {
 
 bool Troll::fight(BaseKnight *knight) {
     if ( knight->getType() == LANCELOT || knight->getType() == PALADIN || knight->getLevel() >= levelO ) {
+        knight->setGil( knight->getGil() + gil );
         return true;
     }
     else {
-        return false;
+        hoi_mau(knight);
+        if (knight->getHp() <= 0) {
+            return false;
+        }
+        else {
+            return true;
+        }
     }
 }
 
@@ -478,7 +539,14 @@ QueenOfCards::QueenOfCards(int id, int eventID) {
 }
 
 bool QueenOfCards::fight(BaseKnight *knight) {
-    return true;
+    if (knight->getLevel() >= levelO) {
+        knight->setGil( knight->getGil()*2 );
+        return true;
+    }
+    else {
+        knight->setGil( knight->getGil()/2 );
+        return false;
+    }
 }
 
 NinaDeRings::NinaDeRings(int id, int eventID) {
@@ -488,6 +556,10 @@ NinaDeRings::NinaDeRings(int id, int eventID) {
 }
 
 bool NinaDeRings::fight(BaseKnight *knight) {
+    if (knight->getGil() >= 50 && knight->getHp() < knight->getMaxHp()/3 ) {
+        knight->setHp( knight->getHp() + knight->getMaxHp()/5 );
+    }
+
     return true;
 }
 
@@ -510,10 +582,19 @@ OmegaWeapon::OmegaWeapon(int id, int eventID) {
 
 bool OmegaWeapon::fight(BaseKnight *knight) {
     if ( (knight->getLevel() == 10 && knight->getHp() == knight->getMaxHp()) || knight->getType() == DRAGON ) {
+        knight->setLevel(10);
+        knight->setGil(999);
         return true;
     }
     else {
-        return false;
+        knight->setHp(0);
+        hoi_mau(knight);
+        if (knight->getHp() <= 0) {
+            return false;
+        }
+        else {
+            return true;
+        }
     }
 }
 
@@ -525,10 +606,18 @@ Hades::Hades(int id, int eventID) {
 
 bool Hades::fight(BaseKnight *knight) {
     if (knight->getLevel() == 10 || (knight->getType() == PALADIN && knight->getLevel() >= 8)) {
+        ren_kiem = true;
         return true;
     }
     else {
-        return false;
+        knight->setHp(0);
+        hoi_mau(knight);
+        if (knight->getHp() <= 0) {
+            return false;
+        }
+        else {
+            return true;
+        }
     }
 }
 /* * * END implement of class BaseOpponent * * */
@@ -564,6 +653,74 @@ bool check_Pythagoras(int n) {          //Kiem tra so Pythagoras
     }
 }
 
+PaladinKnight::PaladinKnight(int id, int maxhp, int level, int gil, int antidote, int phoenixdownI) {
+    this->id = id;
+    this->maxhp = maxhp;
+    this->level = level;
+    this->gil = gil;
+    this->antidote = antidote;
+    this->phoenixdownI = phoenixdownI;
+    this->hp = maxhp;
+    this->knightType = PALADIN;
+    this->knightBaseDamage = 0.06;
+    this->bag = new BagPaladin(phoenixdownI, antidote);
+}
+
+LancelotKnight::LancelotKnight(int id, int maxhp, int level, int gil, int antidote, int phoenixdownI) {
+    this->id = id;
+    this->maxhp = maxhp;
+    this->level = level;
+    this->gil = gil;
+    this->antidote = antidote;
+    this->phoenixdownI = phoenixdownI;
+    this->hp = maxhp;
+    this->knightType = LANCELOT;
+    this->knightBaseDamage = 0.05;
+    this->bag = new BagLanceLot(phoenixdownI, antidote);
+}
+
+DragonKnight::DragonKnight(int id, int maxhp, int level, int gil, int antidote, int phoenixdownI) {
+    this->id = id;
+    this->maxhp = maxhp;
+    this->level = level;
+    this->gil = gil;
+    this->antidote = antidote;
+    this->phoenixdownI = phoenixdownI;
+    this->hp = maxhp;
+    this->knightType = DRAGON;
+    this->knightBaseDamage = 0.075;
+    this->bag = new BagDragon(antidote);
+}
+
+NormalKnight::NormalKnight(int id, int maxhp, int level, int gil, int antidote, int phoenixdownI) {
+    this->id = id;
+    this->maxhp = maxhp;
+    this->level = level;
+    this->gil = gil;
+    this->antidote = antidote;
+    this->phoenixdownI = phoenixdownI;
+    this->hp = maxhp;
+    this->knightType = NORMAL;
+    this->bag = new BagNormal(phoenixdownI, antidote);
+}
+
+BaseKnight *BaseKnight::create(int id, int maxhp, int level, int gil, int antidote, int phoenixdownI) {
+    if (check_Prime(maxhp)) {
+        return new PaladinKnight(id, maxhp, level, gil, antidote, phoenixdownI);
+    }
+    else if (maxhp == 888) {
+        return new LancelotKnight(id, maxhp, level, gil, antidote, phoenixdownI);
+    }
+    else if (check_Pythagoras(maxhp)) {
+        return new DragonKnight(id, maxhp, level, gil, antidote, phoenixdownI);
+    }
+    else {
+        return new NormalKnight(id, maxhp, level, gil, antidote, phoenixdownI);
+    }
+}
+
+
+
 string BaseKnight::toString() const {
     string typeString[4] = {"PALADIN", "LANCELOT", "DRAGON", "NORMAL"};
     // inefficient version, students can change these code
@@ -581,6 +738,32 @@ string BaseKnight::toString() const {
 }
 
 /* * * END implementation of class BaseKnight * * */
+//Implement of class Events
+Events::Events(const string & file_events) {
+    ifstream events_work;
+    events_work.open(file_events);
+    events_work >> num_event;
+
+    arr_event = new int[num_event];
+    for (int j = 0; j < num_event; j++) {
+        events_work >> arr_event[j];
+    }
+
+    events_work.close();
+}
+
+Events::count() const {
+    return num_event;
+}
+
+Events::get(int i) const {
+    return arr_event[i];
+}
+
+Events::~Events() {
+    delete[] arr_event;
+}
+
 
 /* * * BEGIN implementation of class ArmyKnights * * */
 void ArmyKnights::printInfo() const {
@@ -599,6 +782,95 @@ void ArmyKnights::printInfo() const {
 
 void ArmyKnights::printResult(bool win) const {
     cout << (win ? "WIN" : "LOSE") << endl;
+}
+
+ArmyKnights::ArmyKnights(const string & file_armyknights) {
+    ifstream knight_army_file;
+    knight_army_file.open(file_armyknights);
+    knight_army_file >> num_armyknight;
+
+    arr_armyknight = new BaseKnight*[num_armyknight];
+    for (int j = 0; j < num_armyknight; j++) {
+        int temp_maxhp, temp_level, temp_gil, temp_antidote, temp_phoenixI;
+        knight_army_file >> temp_maxhp >> temp_level >> temp_phoenixI >> temp_gil >> temp_antidote;
+        arr_armyknight[j] = BaseKnight::create(j+1, temp_maxhp, temp_level, temp_gil, temp_antidote, temp_phoenixI);
+    }
+}
+
+ArmyKnights::~ArmyKnights() {
+    delete[] arr_armyknight;
+}
+
+bool ArmyKnights::fight(BaseOpponent * opponent) {
+    while( lastKnight() != NULL) {
+        bool temp = opponent->fight( lastKnight() );
+        if (temp == true) {
+            break;
+        }
+        else {
+            num_armyknight--;
+        }
+    }
+
+    if (lastKnight() == NULL) {
+        return false;
+    }
+    else {
+        int gil_remain = 0;
+        if ( lastKnight()->getGil() > 999 ) {
+            gil_remain = lastKnight()->getGil() - 999;
+                for (int q = num_armyknight-1; q >=0; q--) {            //Dong for nay la phan bo GIL
+                    if (arr_armyknight[q]->getGil() + gil_remain <= 999) {
+                        arr_armyknight[q]->setGil( arr_armyknight[q]->getGil() + gil_remain );
+                        gil_remain = 0;
+                        break;
+                    }
+                    else {
+                        gil_remain = arr_armyknight[q]->getGil() + gil_remain  - 999;
+                        arr_armyknight[q]->setGil(999);
+                    }
+                }
+        }
+
+        return true;
+    }
+}
+
+ArmyKnights::adventure(Events * events) {   
+    int num_ev = events->count();
+    int event_temp;
+    bool out_for = false;
+    bool end_game = false;
+
+    for (int z = 0; z < num_ev; z++) {
+        event_temp = events->get(z);
+        if (event_temp >= 1; event_temp <= 11) {
+            out_for = fight(BaseOpponent::create(i, event_temp));
+            if (out_for == false) {
+                return false;
+            }
+        }
+    }
+}
+
+ArmyKnights::count() const{
+    return num_armyknight;
+}
+
+bool ArmyKnights::hasPaladinShield() const {
+    return shield;
+}
+
+bool ArmyKnights::hasLancelotSpear() const {
+    return spear;
+}
+
+bool ArmyKnights::hasGuinevereHair() const {
+    return guini_hair;
+}
+
+bool ArmyKnights::hasExcaliburSword() const {
+    return sword;
 }
 
 /* * * END implementation of class ArmyKnights * * */
