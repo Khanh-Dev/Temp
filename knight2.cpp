@@ -584,6 +584,7 @@ bool OmegaWeapon::fight(BaseKnight *knight) {
     if ( (knight->getLevel() == 10 && knight->getHp() == knight->getMaxHp()) || knight->getType() == DRAGON ) {
         knight->setLevel(10);
         knight->setGil(999);
+        knight->set_win_Omega(true);
         return true;
     }
     else {
@@ -607,6 +608,7 @@ Hades::Hades(int id, int eventID) {
 bool Hades::fight(BaseKnight *knight) {
     if (knight->getLevel() == 10 || (knight->getType() == PALADIN && knight->getLevel() >= 8)) {
         ren_kiem = true;
+        knight->set_win_Hades(true);
         return true;
     }
     else {
@@ -836,7 +838,7 @@ bool ArmyKnights::fight(BaseOpponent * opponent) {
     }
 }
 
-ArmyKnights::adventure(Events * events) {   
+bool ArmyKnights::adventure(Events * events) {   
     int num_ev = events->count();
     int event_temp;
     bool out_for = false;
@@ -844,13 +846,107 @@ ArmyKnights::adventure(Events * events) {
 
     for (int z = 0; z < num_ev; z++) {
         event_temp = events->get(z);
-        if (event_temp >= 1; event_temp <= 11) {
-            out_for = fight(BaseOpponent::create(i, event_temp));
+
+        if ( (event_temp == 10 && meet_omega == true) || (event_temp == 11 && meet_hades == true)){
+            continue;
+        }
+
+        if (event_temp >= 1 && event_temp <= 11) {
+            out_for = fight(BaseOpponent::create(z, event_temp));
             if (out_for == false) {
-                return false;
+                break;
             }
         }
+        else if (event_temp == 112){    //Nhat duoc giot nuoc mat PhoenixdownII
+            for (int i = num_armyknight-1; i >= 0; i--) {           //Duyet doi quan ai co the them vao thi bo vo
+                BaseItem* phoneII = new PhoenixDownII();
+                if ( arr_armyknight[i]->getBag()->insertFirst(phoneII) ) {
+                    BaseItem *temp = arr_armyknight[i]->getBag()->getHead();
+                    phoneII->after = temp;
+                    arr_armyknight[i]->getBag()->getHead()->after = phoneII;
+
+                    break;
+                }
+            }
+        }
+        else if (event_temp == 113){     //Nhat duoc giot nuoc mat PhoenixdownIII
+            for (int i = num_armyknight-1; i >= 0; i--) {           //Duyet doi quan ai co the them vao thi bo vo
+                BaseItem* phoneIII = new PhoenixDownIII();
+                if ( arr_armyknight[i]->getBag()->insertFirst(phoneIII) ) {
+                    BaseItem *temp = arr_armyknight[i]->getBag()->getHead();
+                    phoneIII->after = temp;
+                    arr_armyknight[i]->getBag()->getHead()->after = phoneIII;
+
+                    break;
+                }
+            }
+        }
+        else if (event_temp == 114){     //Nhat duoc giot nuoc mat PhoenixdownIV
+            for (int i = num_armyknight-1; i >= 0; i--) {           //Duyet doi quan ai co the them vao thi bo vo
+                BaseItem* phoneIV = new PhoenixDownIV();
+                if ( arr_armyknight[i]->getBag()->insertFirst(phoneIV) ) {
+                    BaseItem *temp = arr_armyknight[i]->getBag()->getHead();
+                    phoneIV->after = temp;
+                    arr_armyknight[i]->getBag()->getHead()->after = phoneIV;
+
+                    break;
+                }
+            }
+        }
+        else if (event_temp == 95){     //Nhat duoc khien cua Paladin
+            setShield(true);
+        }
+        else if (event_temp == 96){     //Nhat duoc ngon giao cua LanceLot
+            setSpear(true);
+        }
+        else if (event_temp == 97){     //Nhat duoc soi toc cua Guiniver
+            setGuiniHair(true);
+        }
+        else if (event_temp == 98) {    //Gap thanh guom Excalibur
+            if (hasPaladinShield() == true && hasLancelotSpear() == true && hasGuinevereHair() == true) {
+                setSword(true);
+            }
+        }
+        else if (event_temp == 99) {    //Gap ULtimecia
+            int HP_Ultimecia = 5000;
+            if (hasExcaliburSword() == true) {
+                end_game = true;
+            }
+            else if (hasPaladinShield() == true && hasLancelotSpear() == true && hasGuinevereHair() == true) {
+                int temp_abc = num_armyknight-1;
+                for (int q = temp_abc; q >=0; q++) {
+                    if (arr_armyknight[q]->getType() != NORMAL) {
+                        int dam = arr_armyknight[q]->getHp()*arr_armyknight[q]->getLevel()*arr_armyknight[q]->getKnightBaseDamage();
+                        HP_Ultimecia -= dam;
+                        if (HP_Ultimecia <= 0) {
+                            end_game = true;
+                            break;
+                        }
+                        else {
+                            num_armyknight--;
+                        }
+                    }
+                    else {
+                        num_armyknight--;
+                    }
+                }
+            }
+            else {
+                num_armyknight = 0;
+            }
+        }
+
+        if (arr_armyknight[z]->get_win_Hades() == true) {
+            meet_hades = true;
+        }
+        if (arr_armyknight[z]->get_win_Omega() == true) {
+            meet_omega = true;
+        }
+        //Cuoi moi su kien thi in ra thong tin doi quan
+        printInfo();
     }
+
+    return end_game;
 }
 
 ArmyKnights::count() const{

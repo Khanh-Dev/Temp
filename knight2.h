@@ -68,6 +68,7 @@ class BaseOpponent {
         int baseDamage;
         int eventID;
         bool ren_kiem = false;
+
     public:
         static BaseOpponent *create(int id, int eventID);
 
@@ -171,6 +172,8 @@ protected:
 
     //Khai bao them method cho baseKnight
     bool antidoting = false;
+    bool win_Omega = false;
+    bool win_Hades = false;
 
 public:
     static BaseKnight * create(int id, int maxhp, int level, int gil, int antidote, int phoenixdownI);
@@ -226,6 +229,18 @@ public:
     }
     void setAntidoting(bool antidoting) {
         this->antidoting = antidoting;
+    }
+    bool get_win_Omega() {
+        return win_Omega;
+    }
+    void set_win_Omega(bool win_Omega) {
+        this->win_Omega = win_Omega;
+    }
+    bool get_win_Hades() {
+        return win_Hades;
+    }
+    void set_win_Hades(bool win_Hades) {
+        this->win_Hades = win_Hades;
     }
 };
 
