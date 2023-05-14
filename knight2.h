@@ -72,7 +72,9 @@ class BaseOpponent {
     public:
         static BaseOpponent *create(int id, int eventID);
 
-        virtual bool fight(BaseKnight *knight);
+        virtual bool fight(BaseKnight *knight){
+            return true;
+        }
         //void hoi_mau(BaseKnight *knight);
         //void increaseLevel(BaseKnight *knight);
 
@@ -319,7 +321,7 @@ public:
 
 class BaseItem {
 public:
-    BaseItem();
+    BaseItem(){};
     BaseItem* after = nullptr;
     ItemType item;
     virtual bool canUse ( BaseKnight * knight ) = 0;
@@ -358,7 +360,10 @@ public:
     void loadEvents(const string &file_events) {
         events = new Events(file_events);
     }
-    void run();
+    void run() {
+        bool xyz = armyKnights->adventure(events);
+        armyKnights->printResult(xyz);
+    }
 };
 
 #endif // __KNIGHT2_H__
