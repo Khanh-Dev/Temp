@@ -12,6 +12,9 @@ class Events;
 class ArmyKnights;
 class KnightAdventure;
 
+bool check_Prime(int n);
+bool check_Pythagoras(int n);
+
 
 enum ItemType {Antidotex = 0, PhoenixDownIx, PhoenixDownIIx, PhoenixDownIIIx, PhoenixDownIVx};            //Cac loai vat pham
 
@@ -26,6 +29,8 @@ public:
     virtual bool insertFirst(BaseItem * item);
     virtual BaseItem * get(ItemType itemType);
     virtual string toString() const;
+    friend class TornBery;
+
 
 };
 
@@ -83,51 +88,62 @@ class BaseOpponent {
 };
 
 class MadBear : public BaseOpponent {
-    MadBear(int id, int eventID);
-    bool fight(BaseKnight *knight);
+    public:
+        MadBear(int id, int eventID);
+        bool fight(BaseKnight *knight);
 };
 class Bandit : public BaseOpponent {
-    Bandit(int id, int eventID);
-    bool fight(BaseKnight *knight);
+    public:
+        Bandit(int id, int eventID);
+        bool fight(BaseKnight *knight);
 };
 
 class LordLupin : public BaseOpponent {
-    LordLupin(int id, int eventID);
-    bool fight(BaseKnight *knight);
+    public:
+        LordLupin(int id, int eventID);
+        bool fight(BaseKnight *knight);
 };
 class Elf : public BaseOpponent {
-    Elf(int id, int eventID);
-    bool fight(BaseKnight *knight);
+    public:
+        Elf(int id, int eventID);
+        bool fight(BaseKnight *knight);
 };
 
 class Troll : public BaseOpponent {
-    Troll(int id, int eventID);
-    bool fight(BaseKnight *knight);
+    public:
+        Troll(int id, int eventID);
+        bool fight(BaseKnight *knight);
 };
-class TornBey : public BaseOpponent {
-    TornBey(int id, int eventID);
-    bool fight(BaseKnight *knight);
+class TornBery : public BaseOpponent {
+    public:
+        TornBery(int id, int eventID);
+        bool fight(BaseKnight *knight);
 };
 
 class QueenOfCards : public BaseOpponent {
-    QueenOfCards(int id, int eventID);
-    bool fight(BaseKnight *knight);
+    public:
+        QueenOfCards(int id, int eventID);
+        bool fight(BaseKnight *knight);
 };
 class NinaDeRings : public BaseOpponent {
-    NinaDeRings(int id, int eventID);
-    bool fight(BaseKnight *knight);
+    public:
+        NinaDeRings(int id, int eventID);
+        bool fight(BaseKnight *knight);
 };
 class DurianGarden : public BaseOpponent {
-    DurianGarden(int id, int eventID);
-    bool fight(BaseKnight *knight);
+    public:
+        DurianGarden(int id, int eventID);
+        bool fight(BaseKnight *knight);
 };
 class OmegaWeapon : public BaseOpponent {
-    OmegaWeapon(int id, int eventID);
-    bool fight(BaseKnight *knight);
+    public:
+        OmegaWeapon(int id, int eventID);
+        bool fight(BaseKnight *knight);
 };
 class Hades : public BaseOpponent {
-    Hades(int id, int eventID);
-    bool fight(BaseKnight *knight);
+    public:
+        Hades(int id, int eventID);
+        bool fight(BaseKnight *knight);
 };
 
 

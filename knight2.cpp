@@ -274,7 +274,296 @@ BagNormal::BagNormal(int phoenixdownI, int antidote) {
 
 /* * * END implementation of class BaseBag * * */
 
+/* * * Begin implementation of class BaseOpponent* * */
+void increaseLevel(BaseKnight *knight) {
+    if (knight->getLevel() < 10) {
+        knight->setLevel( knight->getLevel() + 1 );
+    }
+}
+
+
+BaseOpponent *BaseOpponent::create(int id, int eventID) {
+    if (eventID == 1) {
+        return new MadBear(id, eventID);
+    }
+    else if (eventID == 2) {
+        return new Bandit(id, eventID);
+    }
+    else if (eventID == 3) {
+        return new LordLupin(id, eventID);
+    }
+    else if (eventID == 4) {
+        return new Elf(id, eventID);
+    }
+    else if (eventID == 5) {
+        return new Troll(id, eventID);
+    }
+    else if (eventID == 6) {
+        return new TornBery(id, eventID);
+    }
+    else if (eventID == 7) {
+        return new QueenOfCards(id, eventID);
+    }
+    else if (eventID == 8) {
+        return new NinaDeRings(id, eventID);
+    }
+    else if (eventID == 9) {
+        return new DurianGarden(id, eventID);
+    }
+    else if (eventID == 10) {
+        return new OmegaWeapon(id, eventID);
+    }
+    else /*if (eventID == 11)*/ {
+        return new Hades(id, eventID);
+    }
+};
+
+MadBear::MadBear(int id, int eventID) {
+    this->id = id;
+    levelO = (id+eventID)%10-1;
+    gil = 100;
+    baseDamage = 10;
+    this->eventID = eventID;
+}
+
+bool MadBear::fight(BaseKnight *knight) {
+    if ( knight->getType() == LANCELOT || knight->getType() == PALADIN || knight->getLevel() >= levelO ) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+Bandit::Bandit(int id, int eventID) {
+    this->id = id;
+    levelO = (id+eventID)%10 - 1;
+    gil = 150;
+    baseDamage = 15;
+    this->eventID = eventID;
+}
+
+bool Bandit::fight(BaseKnight *knight) {
+    if ( knight->getType() == LANCELOT || knight->getType() == PALADIN || knight->getLevel() >= levelO ) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+LordLupin::LordLupin(int id, int eventID) {
+    this->id = id;
+    levelO = (id+eventID)%10 - 1;
+    gil = 450;
+    baseDamage = 45;
+    this->eventID = eventID;
+}
+
+bool LordLupin::fight(BaseKnight *knight) {
+    if ( knight->getType() == LANCELOT || knight->getType() == PALADIN || knight->getLevel() >= levelO ) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+Elf::Elf(int id, int eventID) {
+    this->id = id;
+    levelO = (id+eventID)%10 - 1;
+    gil = 750;
+    baseDamage = 75;
+    this->eventID = eventID;
+}
+
+bool Elf::fight(BaseKnight *knight) {
+    if ( knight->getType() == LANCELOT || knight->getType() == PALADIN || knight->getLevel() >= levelO ) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+Troll::Troll(int id, int eventID) {
+    this->id = id;
+    levelO = (id+eventID)%10 - 1;
+    gil = 800;
+    baseDamage = 95;
+    this->eventID = eventID;
+}
+
+bool Troll::fight(BaseKnight *knight) {
+    if ( knight->getType() == LANCELOT || knight->getType() == PALADIN || knight->getLevel() >= levelO ) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+TornBery::TornBery(int id, int eventID) {
+    this->id = id;
+    levelO = (id+eventID)%10 - 1;
+    this->eventID = eventID;
+}
+
+bool TornBery::fight(BaseKnight *knight) {
+    if ( knight->getLevel() >= levelO ) {
+        increaseLevel(knight);
+        return true;
+    }
+    else {
+        knight->setAntidoting(true);
+        BaseItem *temp = knight->getBag()->head;               
+
+        while (temp != NULL) {
+            if ( temp->canUse(knight) ) {         //Khi duyet tui do neu vat pham do dung duoc
+                temp = knight->getBag()->get(temp->item);
+                temp->use(knight);
+
+                //Xoa di item do, chua hoan thien
+                break;      //Thoat vong duyet tui do
+            }
+            else {
+                temp = temp->after;             //Di den vat pham ke tiep trong tui do
+            }
+        }
+
+        if (knight->getAntidoting() == true) {
+            if (knight->getBag()->bag_num_now <= 3) {
+                knight->getBag()->head = nullptr;
+                knight->getBag()->bag_num_now = 0;
+            }
+            else {
+                for (int z = 1; z <=3; z++) {
+                    BaseItem *temp = knight->getBag()->head;
+                    knight->getBag()->head = temp->after;
+                }
+                knight->getBag()->bag_num_now -= 3;
+            }
+            knight->setHp(knight->getHp() - 10);
+            if (knight->getHp() <= 0) {
+                BaseItem *temp = knight->getBag()->head;               
+
+                while (temp != NULL) {
+                    if ( temp->canUse( knight ) ) {         //Khi duyet tui do neu vat pham do dung duoc
+                        temp = knight->getBag()->get(temp->item);
+                        temp->use( knight );
+
+                        //Xoa di item do, chua hoan thien
+                        break;      //Thoat vong duyet tui do
+                    }
+                    else {
+                        temp = temp->after;             //Di den vat pham ke tiep trong tui do
+                    }
+                }
+
+                if (knight->getHp() <= 0){
+                    return false;
+                }
+            }
+        }
+        
+    }
+
+    return true;
+}
+
+QueenOfCards::QueenOfCards(int id, int eventID) {
+    this->id = id;
+    levelO = (id+eventID)%10 - 1;
+    this->eventID = eventID;
+}
+
+bool QueenOfCards::fight(BaseKnight *knight) {
+    return true;
+}
+
+NinaDeRings::NinaDeRings(int id, int eventID) {
+    this->id = id;
+    levelO = (id+eventID)%10 - 1;
+    this->eventID = eventID;
+}
+
+bool NinaDeRings::fight(BaseKnight *knight) {
+    return true;
+}
+
+DurianGarden::DurianGarden(int id, int eventID) {
+    this->id = id;
+    levelO = (id+eventID)%10 - 1;
+    this->eventID = eventID;
+}
+
+bool DurianGarden::fight(BaseKnight *knight) {
+    knight->setHp( knight->getMaxHp() );
+    return true;
+}
+
+OmegaWeapon::OmegaWeapon(int id, int eventID) {
+    this->id = id;
+    levelO = (id+eventID)%10 - 1;
+    this->eventID = eventID;
+}
+
+bool OmegaWeapon::fight(BaseKnight *knight) {
+    if ( (knight->getLevel() == 10 && knight->getHp() == knight->getMaxHp()) || knight->getType() == DRAGON ) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+Hades::Hades(int id, int eventID) {
+    this->id = id;
+    levelO = (id+eventID)%10 - 1;
+    this->eventID = eventID;
+}
+
+bool Hades::fight(BaseKnight *knight) {
+    if (knight->getLevel() == 10 || (knight->getType() == PALADIN && knight->getLevel() >= 8)) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+/* * * END implement of class BaseOpponent * * */
+
 /* * * BEGIN implementation of class BaseKnight * * */
+bool check_Prime(int n ) {              //Kiem tra so nguyen to
+    int count  = 0;
+    for (int i = 1; i <= n; i++) {
+        if (n % i  == 0) {
+            count++;
+        }
+    }
+    if (count  == 2) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+bool check_Pythagoras(int n) {          //Kiem tra so Pythagoras   
+    int a,b,c;
+    if (n >= 100) {
+        a = n % 10;
+        b = (n % 100) / 10;
+        c = n / 100;
+    }
+    if (a*a + b*b == c*c || a*a + c*c == b*b || b*b + c*c == a*a) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
 string BaseKnight::toString() const {
     string typeString[4] = {"PALADIN", "LANCELOT", "DRAGON", "NORMAL"};
     // inefficient version, students can change these code
