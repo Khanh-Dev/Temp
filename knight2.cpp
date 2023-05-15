@@ -30,12 +30,10 @@ BaseItem* BaseBag::get(ItemType itemType) {
     if (result == true) {       //Neu co vat pham can trong tui do
         if (bag_num_now == 1) {     //Neu co 1 vat pham trong tui do
             head = NULL;
-            bag_num_now--;
         }
         else if (bag_num_now >= 2) {        //Neu co tu 2 vat pham tro len trong tui do
             if (head->item == itemType) {   //Neu pham vat can tim o dau tui do
                 head = head->after;
-                bag_num_now--;
             }
             else {                          //Neu vat pham khong o dau tui do
                 BaseItem* currentNode = head;
@@ -51,12 +49,13 @@ BaseItem* BaseBag::get(ItemType itemType) {
 
                         //Xoa vat pham dau
                         head = head->after;
-                        bag_num_now--;
                     }
                 }
             }
 
         }
+
+        bag_num_now--;
     }
 
     return temp;
@@ -88,10 +87,10 @@ string BaseBag::toString() const {              //In ra tui do theo dinh dang
         if (temp->after != NULL) {
             first += ",";
         }
-        else {
-            first += "]";
-        }
+        
+        temp = temp->after;
     }
+    first += "]";
     return first;
 }
 
@@ -476,56 +475,63 @@ bool TornBery::fight(BaseKnight *knight) {
         return true;
     }
     else {
-        knight->setAntidoting(true);
-        BaseItem *temp = knight->getBag()->head;               
 
-        while (temp != NULL) {
-            if ( temp->canUse(knight) ) {         //Khi duyet tui do neu vat pham do dung duoc
-                temp = knight->getBag()->get(temp->item);
-                temp->use(knight);
+        if (knight->getType() == DRAGON) {
+            //Do nothing
+        }
+        else {
+            knight->setAntidoting(true);
+            BaseItem *temp = knight->getBag()->head;               
 
-                //Xoa di item do, chua hoan thien
-                break;      //Thoat vong duyet tui do
+            while (temp != NULL) {
+                if ( temp->canUse(knight) ) {         //Khi duyet tui do neu vat pham do dung duoc
+                    temp = knight->getBag()->get(temp->item);
+                    temp->use(knight);
+
+                    //Xoa di item do, chua hoan thien
+                    break;      //Thoat vong duyet tui do
+                }
+                else {
+                    temp = temp->after;             //Di den vat pham ke tiep trong tui do
+                }
             }
-            else {
-                temp = temp->after;             //Di den vat pham ke tiep trong tui do
+
+            if (knight->getAntidoting() == true) {
+                if (knight->getBag()->bag_num_now <= 3) {
+                    knight->getBag()->head = nullptr;
+                    knight->getBag()->bag_num_now = 0;
+                }
+                else {
+                    for (int z = 1; z <=3; z++) {
+                        BaseItem *temp = knight->getBag()->head;
+                        knight->getBag()->head = temp->after;
+                    }
+                    knight->getBag()->bag_num_now -= 3;
+                }
+                knight->setHp(knight->getHp() - 10);
+                if (knight->getHp() <= 0) {
+                    BaseItem *temp = knight->getBag()->head;               
+
+                    while (temp != NULL) {
+                        if ( temp->canUse( knight ) ) {         //Khi duyet tui do neu vat pham do dung duoc
+                            temp = knight->getBag()->get(temp->item);
+                            temp->use( knight );
+
+                            //Xoa di item do, chua hoan thien
+                            break;      //Thoat vong duyet tui do
+                        }
+                        else {
+                            temp = temp->after;             //Di den vat pham ke tiep trong tui do
+                        }
+                    }
+
+                    if (knight->getHp() <= 0){
+                        return false;
+                    }
+                }
             }
         }
-
-        if (knight->getAntidoting() == true) {
-            if (knight->getBag()->bag_num_now <= 3) {
-                knight->getBag()->head = nullptr;
-                knight->getBag()->bag_num_now = 0;
-            }
-            else {
-                for (int z = 1; z <=3; z++) {
-                    BaseItem *temp = knight->getBag()->head;
-                    knight->getBag()->head = temp->after;
-                }
-                knight->getBag()->bag_num_now -= 3;
-            }
-            knight->setHp(knight->getHp() - 10);
-            if (knight->getHp() <= 0) {
-                BaseItem *temp = knight->getBag()->head;               
-
-                while (temp != NULL) {
-                    if ( temp->canUse( knight ) ) {         //Khi duyet tui do neu vat pham do dung duoc
-                        temp = knight->getBag()->get(temp->item);
-                        temp->use( knight );
-
-                        //Xoa di item do, chua hoan thien
-                        break;      //Thoat vong duyet tui do
-                    }
-                    else {
-                        temp = temp->after;             //Di den vat pham ke tiep trong tui do
-                    }
-                }
-
-                if (knight->getHp() <= 0){
-                    return false;
-                }
-            }
-        }
+        
         
     }
 
@@ -544,8 +550,14 @@ bool QueenOfCards::fight(BaseKnight *knight) {
         return true;
     }
     else {
-        knight->setGil( knight->getGil()/2 );
-        return false;
+        if (knight->getType() == PALADIN) {
+        }
+        else {
+            knight->setGil( knight->getGil()/2 );
+        }
+
+        return true;
+        
     }
 }
 
@@ -556,8 +568,14 @@ NinaDeRings::NinaDeRings(int id, int eventID) {
 }
 
 bool NinaDeRings::fight(BaseKnight *knight) {
-    if (knight->getGil() >= 50 && knight->getHp() < knight->getMaxHp()/3 ) {
+    if ( knight->getType() == PALADIN && knight->getHp() <  knight->getMaxHp()/3 ) {
         knight->setHp( knight->getHp() + knight->getMaxHp()/5 );
+    }
+    else {
+        if (knight->getGil() >= 50 && knight->getHp() < knight->getMaxHp()/3 ) {
+            knight->setHp( knight->getHp() + knight->getMaxHp()/5 );
+            knight->setGil( knight->getGil() - 50 );
+        }
     }
 
     return true;
@@ -741,7 +759,7 @@ string BaseKnight::toString() const {
 
 /* * * END implementation of class BaseKnight * * */
 //Implement of class Events
-Events::Events(const string & file_events) {
+Events::Events(const string &file_events) {
     ifstream events_work;
     events_work.open(file_events);
     events_work >> num_event;
@@ -754,13 +772,7 @@ Events::Events(const string & file_events) {
     events_work.close();
 }
 
-Events::count() const {
-    return num_event;
-}
 
-Events::get(int i) const {
-    return arr_event[i];
-}
 
 Events::~Events() {
     delete[] arr_event;
@@ -770,10 +782,13 @@ Events::~Events() {
 /* * * BEGIN implementation of class ArmyKnights * * */
 void ArmyKnights::printInfo() const {
     cout << "No. knights: " << this->count();
+    
     if (this->count() > 0) {
+        
         BaseKnight * lknight = lastKnight(); // last knight
         cout << ";" << lknight->toString();
     }
+    
     cout << ";PaladinShield:" << this->hasPaladinShield()
         << ";LancelotSpear:" << this->hasLancelotSpear()
         << ";GuinevereHair:" << this->hasGuinevereHair()
@@ -845,7 +860,9 @@ bool ArmyKnights::adventure(Events * events) {
     bool end_game = false;
 
     for (int z = 0; z < num_ev; z++) {
+        
         event_temp = events->get(z);
+        cout << "Event i = " << event_temp << endl;
 
         if ( (event_temp == 10 && meet_omega == true) || (event_temp == 11 && meet_hades == true)){
             continue;
@@ -861,10 +878,11 @@ bool ArmyKnights::adventure(Events * events) {
             for (int i = num_armyknight-1; i >= 0; i--) {           //Duyet doi quan ai co the them vao thi bo vo
                 BaseItem* phoneII = new PhoenixDownII();
                 if ( arr_armyknight[i]->getBag()->insertFirst(phoneII) ) {
-                    BaseItem *temp = arr_armyknight[i]->getBag()->getHead();
-                    phoneII->after = temp;
-                    arr_armyknight[i]->getBag()->getHead()->after = phoneII;
-
+                    
+                    phoneII->after = arr_armyknight[i]->getBag()->getHead();
+                    arr_armyknight[i]->getBag()->setHead(phoneII);
+                    arr_armyknight[i]->getBag()->setNumBag(1);
+                    
                     break;
                 }
             }
@@ -873,9 +891,9 @@ bool ArmyKnights::adventure(Events * events) {
             for (int i = num_armyknight-1; i >= 0; i--) {           //Duyet doi quan ai co the them vao thi bo vo
                 BaseItem* phoneIII = new PhoenixDownIII();
                 if ( arr_armyknight[i]->getBag()->insertFirst(phoneIII) ) {
-                    BaseItem *temp = arr_armyknight[i]->getBag()->getHead();
-                    phoneIII->after = temp;
-                    arr_armyknight[i]->getBag()->getHead()->after = phoneIII;
+                    phoneIII->after = arr_armyknight[i]->getBag()->getHead();
+                    arr_armyknight[i]->getBag()->setHead(phoneIII);
+                    arr_armyknight[i]->getBag()->setNumBag(1);
 
                     break;
                 }
@@ -885,9 +903,9 @@ bool ArmyKnights::adventure(Events * events) {
             for (int i = num_armyknight-1; i >= 0; i--) {           //Duyet doi quan ai co the them vao thi bo vo
                 BaseItem* phoneIV = new PhoenixDownIV();
                 if ( arr_armyknight[i]->getBag()->insertFirst(phoneIV) ) {
-                    BaseItem *temp = arr_armyknight[i]->getBag()->getHead();
-                    phoneIV->after = temp;
-                    arr_armyknight[i]->getBag()->getHead()->after = phoneIV;
+                    phoneIV->after = arr_armyknight[i]->getBag()->getHead();
+                    arr_armyknight[i]->getBag()->setHead(phoneIV);
+                    arr_armyknight[i]->getBag()->setNumBag(1);
 
                     break;
                 }
@@ -895,12 +913,15 @@ bool ArmyKnights::adventure(Events * events) {
         }
         else if (event_temp == 95){     //Nhat duoc khien cua Paladin
             setShield(true);
+            cout << "TEST" << endl;
         }
         else if (event_temp == 96){     //Nhat duoc ngon giao cua LanceLot
             setSpear(true);
+            cout << "TEST" << endl;
         }
         else if (event_temp == 97){     //Nhat duoc soi toc cua Guiniver
             setGuiniHair(true);
+            cout << "TEST" << hasGuinevereHair() << endl;
         }
         else if (event_temp == 98) {    //Gap thanh guom Excalibur
             if (hasPaladinShield() == true && hasLancelotSpear() == true && hasGuinevereHair() == true) {
@@ -914,9 +935,9 @@ bool ArmyKnights::adventure(Events * events) {
             }
             else if (hasPaladinShield() == true && hasLancelotSpear() == true && hasGuinevereHair() == true) {
                 int temp_abc = num_armyknight-1;
-                for (int q = temp_abc; q >=0; q++) {
-                    if (arr_armyknight[q]->getType() != NORMAL) {
-                        int dam = arr_armyknight[q]->getHp()*arr_armyknight[q]->getLevel()*arr_armyknight[q]->getKnightBaseDamage();
+                for (int q = temp_abc; q >=0; q--) {
+                    if (lastKnight()->getType() != NORMAL) {
+                        int dam = lastKnight()->getHp()*lastKnight()->getLevel()*lastKnight()->getKnightBaseDamage();
                         HP_Ultimecia -= dam;
                         if (HP_Ultimecia <= 0) {
                             end_game = true;
@@ -943,13 +964,14 @@ bool ArmyKnights::adventure(Events * events) {
             meet_omega = true;
         }
         //Cuoi moi su kien thi in ra thong tin doi quan
+        cout << "End Events" << endl;
         printInfo();
     }
 
     return end_game;
 }
 
-ArmyKnights::count() const{
+int ArmyKnights::count() const{
     return num_armyknight;
 }
 
@@ -962,7 +984,7 @@ bool ArmyKnights::hasLancelotSpear() const {
 }
 
 bool ArmyKnights::hasGuinevereHair() const {
-    return guini_hair;
+    return hair;
 }
 
 bool ArmyKnights::hasExcaliburSword() const {

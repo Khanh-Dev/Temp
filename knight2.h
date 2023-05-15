@@ -34,8 +34,15 @@ public:
     BaseItem* getHead() {
         return head;
     }
+    void setHead(BaseItem* head) {
+        this->head = head;
+    }
 
-
+    void setNumBag(int n) {
+        bag_num_now += n;
+    }
+    
+    
 };
 
 class BagPaladin : public BaseBag {
@@ -271,7 +278,7 @@ protected:
     //Khai bao them method cho doi quan hiep si
     bool shield = false;
     bool spear = false;
-    bool guini_hair = false;
+    bool hair = false;
     bool sword = false;
     bool meet_omega = false;
     bool meet_hades = false;
@@ -304,7 +311,7 @@ public:
 
     //Ve Toc cua Guiniver
     void setGuiniHair(bool guini_hair) {
-        this->guini_hair = guini_hair;
+        this->hair = guini_hair;
     }
     bool hasGuinevereHair() const;
 
@@ -336,8 +343,12 @@ private:
 public:
     Events(const string & file_events);
 
-    int count() const;
-    int get(int i) const;
+    int count() const {
+        return num_event;
+    }
+    int get(int i) const {
+        return arr_event[i];
+    }
 
     ~Events();
 };
