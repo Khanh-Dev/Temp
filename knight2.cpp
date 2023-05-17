@@ -18,21 +18,20 @@ bool BaseBag::insertFirst(BaseItem *item)
 
 BaseItem *BaseBag::get(ItemType itemType)
 {
-    BaseItem *temp = head;
+    BaseItem *tempo = head;
     bool result = false;
-
-    while (temp != NULL)
-    {
-        if (temp->item = itemType)
-        {
+    
+       
+    while (tempo != NULL) {
+        if (tempo->item == itemType) {
             result = true;
             break;
         }
-        else
-        {
-            temp = temp->after;
+        else {
+            tempo = tempo->after;
         }
     }
+     
 
     if (result == true)
     { // Neu co vat pham can trong tui do
@@ -41,7 +40,7 @@ BaseItem *BaseBag::get(ItemType itemType)
             head = NULL;
         }
         else if (bag_num_now >= 2)
-        { // Neu co tu 2 vat pham tro len trong tui do
+        { // Neu co tu 2 vat pham tro len trong tui do          
             if (head->item == itemType)
             { // Neu pham vat can tim o dau tui do
                 head = head->after;
@@ -55,23 +54,29 @@ BaseItem *BaseBag::get(ItemType itemType)
                     if (currentNode->item == itemType)
                     {
                         // Doi cho cho 2 vat pham
-                        head = currentNode->after;
-                        preNode->after = head;
-                        BaseItem *metmoi = currentNode;
-                        currentNode = head;
-                        head = metmoi;
-
+                        BaseItem *metmoi = head;
+                        head = currentNode;
+                        preNode->after = metmoi;
+                        metmoi->after = currentNode->after;
+                        currentNode->after = preNode;
                         // Xoa vat pham dau
                         head = head->after;
+                    }
+                    else {
+                        preNode = currentNode;
+                        currentNode = currentNode->after;
                     }
                 }
             }
         }
-
+        
         bag_num_now--;
     }
-
-    return temp;
+    else {
+        return NULL;
+    }
+    
+    return tempo;
 }
 
 string BaseBag::toString() const
@@ -250,6 +255,7 @@ public:
 
 BagPaladin::BagPaladin(int phoenixdownI, int antidote)
 {
+    max_bag = 999;
     for (int q = 0; q < phoenixdownI; q++)
     {
         BaseItem *abc = new PhoenixDownI();
@@ -263,62 +269,95 @@ BagPaladin::BagPaladin(int phoenixdownI, int antidote)
         abc->after = head;
         head = abc;
     }
-
     bag_num_now = phoenixdownI + antidote;
-    max_bag = 999;
+
+    
 }
 
 BagLanceLot::BagLanceLot(int phoenixdownI, int antidote)
 {
+    max_bag = 16;
     for (int i = 0; i < phoenixdownI; i++)
     {
-        BaseItem *abc = new PhoenixDownI();
-        abc->after = head;
-        head = abc;
+        if (bag_num_now >= max_bag) {
+            break;
+        }
+        else {
+            BaseItem *abc = new PhoenixDownI();
+            abc->after = head;
+            head = abc;
+            bag_num_now++;
+        }
+        
     }
 
     for (int i = 0; i < antidote; i++)
     {
-        BaseItem *abc = new Antidote();
-        abc->after = head;
-        head = abc;
+        if (bag_num_now >= max_bag) {
+            break;
+        }
+        else {
+            BaseItem *abc = new Antidote();
+            abc->after = head;
+            head = abc;
+            bag_num_now++;
+        }
+        
     }
 
-    bag_num_now = phoenixdownI + antidote;
-    max_bag = 16;
+    
 }
 
 BagDragon::BagDragon(int phoenixdownI)
 {
+    max_bag = 14;
     for (int i = 0; i < phoenixdownI; i++)
     {
-        BaseItem *abc = new PhoenixDownI();
-        abc->after = this->head;
-        head = abc;
+        if (bag_num_now >= max_bag) {
+            break;
+        }
+        else {
+            BaseItem *abc = new PhoenixDownI();
+            abc->after = this->head;
+            head = abc;
+            bag_num_now++;
+        }
+        
     }
 
-    bag_num_now = phoenixdownI;
-    max_bag = 14;
+    
 }
 
 BagNormal::BagNormal(int phoenixdownI, int antidote)
 {
+    max_bag = 19;
     for (int i = 0; i < phoenixdownI; i++)
     {
-        BaseItem *abc = new PhoenixDownI();
-        abc->after = this->head;
-        head = abc;
+        if (bag_num_now >= max_bag) {
+            break;
+        }
+        else {
+            BaseItem *abc = new PhoenixDownI();
+            abc->after = head;
+            head = abc;
+            bag_num_now++;
+        }
+        
     }
 
     for (int i = 0; i < antidote; i++)
     {
-        BaseItem *abc = new Antidote();
-        abc->after = this->head;
-        head = abc;
+        if (bag_num_now >= max_bag) {
+            break;
+        }
+        else {
+            BaseItem *abc = new Antidote();
+            abc->after = head;
+            head = abc;
+            bag_num_now++;
+        }
+        
     }
-
-    bag_num_now = phoenixdownI + antidote;
-    max_bag = 19;
 }
 
 /* * * END implementation of class BaseBag * * */
@@ -345,8 +384,10 @@ void hoi_mau(BaseKnight *knight)
                 temp = knight->getBag()->get(temp->item);
                 temp->use(knight);
 
-                // Xoa di item do, chua hoan thien
-                break; // Thoat vong duyet tui do
+                if (knight->getHp() > 0){
+                    break; // Thoat vong duyet tui do
+                }                
+                
             }
             else
             {
@@ -416,7 +457,7 @@ BaseOpponent *BaseOpponent::create(int id, int eventID)
 MadBear::MadBear(int id, int eventID)
 {
     this->id = id;
-    levelO = (id + eventID) % 10 - 1;
+    levelO = (id + eventID) % 10 + 1;
     gil = 100;
     baseDamage = 10;
     this->eventID = eventID;
@@ -431,6 +472,9 @@ bool MadBear::fight(BaseKnight *knight)
     }
     else
     {
+        int HP_temp = knight->getHp();
+        HP_temp = HP_temp - baseDamage*( levelO - knight->getLevel());
+        knight->setHp(HP_temp);       //Tinh lai HP cua hiep si voi cong thuc da cho
         hoi_mau(knight);
         if (knight->getHp() <= 0)
         {
@@ -446,7 +490,7 @@ bool MadBear::fight(BaseKnight *knight)
 Bandit::Bandit(int id, int eventID)
 {
     this->id = id;
-    levelO = (id + eventID) % 10 - 1;
+    levelO = (id + eventID) % 10 + 1;
     gil = 150;
     baseDamage = 15;
     this->eventID = eventID;
@@ -461,6 +505,9 @@ bool Bandit::fight(BaseKnight *knight)
     }
     else
     {
+        int HP_temp = knight->getHp();
+        HP_temp = HP_temp - baseDamage*( levelO - knight->getLevel());
+        knight->setHp(HP_temp);       //Tinh lai HP cua hiep si voi cong thuc da cho
         hoi_mau(knight);
         if (knight->getHp() <= 0)
         {
@@ -476,7 +523,7 @@ bool Bandit::fight(BaseKnight *knight)
 LordLupin::LordLupin(int id, int eventID)
 {
     this->id = id;
-    levelO = (id + eventID) % 10 - 1;
+    levelO = (id + eventID) % 10 + 1;
     gil = 450;
     baseDamage = 45;
     this->eventID = eventID;
@@ -491,6 +538,9 @@ bool LordLupin::fight(BaseKnight *knight)
     }
     else
     {
+        int HP_temp = knight->getHp();
+        HP_temp = HP_temp - baseDamage*( levelO - knight->getLevel());
+        knight->setHp(HP_temp);       //Tinh lai HP cua hiep si voi cong thuc da cho
         hoi_mau(knight);
         if (knight->getHp() <= 0)
         {
@@ -506,7 +556,7 @@ bool LordLupin::fight(BaseKnight *knight)
 Elf::Elf(int id, int eventID)
 {
     this->id = id;
-    levelO = (id + eventID) % 10 - 1;
+    levelO = (id + eventID) % 10 + 1;
     gil = 750;
     baseDamage = 75;
     this->eventID = eventID;
@@ -521,6 +571,9 @@ bool Elf::fight(BaseKnight *knight)
     }
     else
     {
+        int HP_temp = knight->getHp();
+        HP_temp = HP_temp - baseDamage*( levelO - knight->getLevel());
+        knight->setHp(HP_temp);       //Tinh lai HP cua hiep si voi cong thuc da cho
         hoi_mau(knight);
         if (knight->getHp() <= 0)
         {
@@ -536,7 +589,7 @@ bool Elf::fight(BaseKnight *knight)
 Troll::Troll(int id, int eventID)
 {
     this->id = id;
-    levelO = (id + eventID) % 10 - 1;
+    levelO = (id + eventID) % 10 + 1;
     gil = 800;
     baseDamage = 95;
     this->eventID = eventID;
@@ -551,6 +604,9 @@ bool Troll::fight(BaseKnight *knight)
     }
     else
     {
+        int HP_temp = knight->getHp();
+        HP_temp = HP_temp - baseDamage*( levelO - knight->getLevel());
+        knight->setHp(HP_temp);       //Tinh lai HP cua hiep si voi cong thuc da cho
         hoi_mau(knight);
         if (knight->getHp() <= 0)
         {
@@ -566,12 +622,13 @@ bool Troll::fight(BaseKnight *knight)
 TornBery::TornBery(int id, int eventID)
 {
     this->id = id;
-    levelO = (id + eventID) % 10 - 1;
+    levelO = (id + eventID) % 10 + 1;
     this->eventID = eventID;
 }
 
 bool TornBery::fight(BaseKnight *knight)
 {
+
     if (knight->getLevel() >= levelO)
     {
         increaseLevel(knight);
@@ -579,7 +636,6 @@ bool TornBery::fight(BaseKnight *knight)
     }
     else
     {
-
         if (knight->getType() == DRAGON)
         {
             // Do nothing
@@ -587,22 +643,9 @@ bool TornBery::fight(BaseKnight *knight)
         else
         {
             knight->setAntidoting(true);
-            BaseItem *temp = knight->getBag()->head;
-
-            while (temp != NULL)
-            {
-                if (temp->canUse(knight))
-                { // Khi duyet tui do neu vat pham do dung duoc
-                    temp = knight->getBag()->get(temp->item);
-                    temp->use(knight);
-
-                    // Xoa di item do, chua hoan thien
-                    break; // Thoat vong duyet tui do
-                }
-                else
-                {
-                    temp = temp->after; // Di den vat pham ke tiep trong tui do
-                }
+            BaseItem* temp = knight->getBag()->get(Antidotex);
+            if (temp != NULL) {
+                temp->use(knight);
             }
 
             if (knight->getAntidoting() == true)
@@ -624,23 +667,7 @@ bool TornBery::fight(BaseKnight *knight)
                 knight->setHp(knight->getHp() - 10);
                 if (knight->getHp() <= 0)
                 {
-                    BaseItem *temp = knight->getBag()->head;
-
-                    while (temp != NULL)
-                    {
-                        if (temp->canUse(knight))
-                        { // Khi duyet tui do neu vat pham do dung duoc
-                            temp = knight->getBag()->get(temp->item);
-                            temp->use(knight);
-
-                            // Xoa di item do, chua hoan thien
-                            break; // Thoat vong duyet tui do
-                        }
-                        else
-                        {
-                            temp = temp->after; // Di den vat pham ke tiep trong tui do
-                        }
-                    }
+                    hoi_mau(knight);
 
                     if (knight->getHp() <= 0)
                     {
@@ -657,7 +684,7 @@ bool TornBery::fight(BaseKnight *knight)
 QueenOfCards::QueenOfCards(int id, int eventID)
 {
     this->id = id;
-    levelO = (id + eventID) % 10 - 1;
+    levelO = (id + eventID) % 10 + 1;
     this->eventID = eventID;
 }
 
@@ -666,7 +693,7 @@ bool QueenOfCards::fight(BaseKnight *knight)
     if (knight->getLevel() >= levelO)
     {
         knight->setGil(knight->getGil() * 2);
-        return true;
+
     }
     else
     {
@@ -678,14 +705,16 @@ bool QueenOfCards::fight(BaseKnight *knight)
             knight->setGil(knight->getGil() / 2);
         }
 
-        return true;
+
     }
+
+    return true;
 }
 
 NinaDeRings::NinaDeRings(int id, int eventID)
 {
     this->id = id;
-    levelO = (id + eventID) % 10 - 1;
+    levelO = (id + eventID) % 10 + 1;
     this->eventID = eventID;
 }
 
@@ -710,7 +739,7 @@ bool NinaDeRings::fight(BaseKnight *knight)
 DurianGarden::DurianGarden(int id, int eventID)
 {
     this->id = id;
-    levelO = (id + eventID) % 10 - 1;
+    levelO = (id + eventID) % 10 + 1;
     this->eventID = eventID;
 }
 
@@ -723,7 +752,7 @@ bool DurianGarden::fight(BaseKnight *knight)
 OmegaWeapon::OmegaWeapon(int id, int eventID)
 {
     this->id = id;
-    levelO = (id + eventID) % 10 - 1;
+    levelO = (id + eventID) % 10 + 1;
     this->eventID = eventID;
 }
 
@@ -739,6 +768,7 @@ bool OmegaWeapon::fight(BaseKnight *knight)
     else
     {
         knight->setHp(0);
+        
         hoi_mau(knight);
         if (knight->getHp() <= 0)
         {
@@ -754,7 +784,7 @@ bool OmegaWeapon::fight(BaseKnight *knight)
 Hades::Hades(int id, int eventID)
 {
     this->id = id;
-    levelO = (id + eventID) % 10 - 1;
+    levelO = (id + eventID) % 10 + 1;
     this->eventID = eventID;
 }
 
@@ -976,20 +1006,15 @@ ArmyKnights::~ArmyKnights()
 
 bool ArmyKnights::fight(BaseOpponent *opponent)
 {
-    while (lastKnight() != NULL)
-    {
-        bool temp = opponent->fight(lastKnight());
-        if (temp == true)
-        {
-            break;
-        }
-        else
-        {
+    if (lastKnight() != NULL) {
+        //cout << "@@" << endl;
+        bool temp = opponent->fight( lastKnight() );
+        if (temp == false) {
             num_armyknight--;
         }
     }
 
-    if (lastKnight() == NULL)
+    if (lastKnight() == NULL || num_armyknight == 0)
     {
         return false;
     }
@@ -1028,19 +1053,28 @@ bool ArmyKnights::adventure(Events *events)
 
     for (int z = 0; z < num_ev; z++)
     {
-
+        
         event_temp = events->get(z);
-        //cout << "Event i = " << event_temp << endl;
-
-        if ((event_temp == 10 && meet_omega == true) || (event_temp == 11 && meet_hades == true))
-        {
+        //cout << "Event: " << event_temp << endl;
+        if ((event_temp == 10 && meet_omega == true) || (event_temp == 11 && meet_hades == true)){
+            printInfo();
             continue;
         }
 
-        if (event_temp >= 1 && event_temp <= 11)
+        if (event_temp >= 1 && event_temp <= 11)        //Dam voi cac quai vat tu su kien 1 den 11
         {
-            out_for = fight(BaseOpponent::create(z, event_temp));
-            //cout<<"test"<<endl;
+            out_for = fight(BaseOpponent::create(z, event_temp));       //Neu su kien thua
+            if (out_for == true) {
+                if (lastKnight()->get_win_Hades() == true)
+                {
+                    meet_hades = true;
+                }
+                if (lastKnight()->get_win_Omega() == true)
+                {
+                    meet_omega = true;
+                }
+            }
+            
         }
         else if (event_temp == 112)
         { // Nhat duoc giot nuoc mat PhoenixdownII
@@ -1145,17 +1179,8 @@ bool ArmyKnights::adventure(Events *events)
             }
         }
 
-        if (lastKnight()->get_win_Hades() == true)
-        {
-            meet_hades = true;
-        }
-        if (lastKnight()->get_win_Omega() == true)
-        {
-            cout << meet_omega << endl;
-            meet_omega = true;
-        }
+        
         // Cuoi moi su kien thi in ra thong tin doi quan
-        //cout << "End Events" << endl;
         printInfo();
     }
 

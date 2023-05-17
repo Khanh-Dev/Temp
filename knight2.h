@@ -21,7 +21,7 @@ enum ItemType {Antidotex = 0, PhoenixDownIx, PhoenixDownIIx, PhoenixDownIIIx, Ph
 class BaseBag {
 protected:
     BaseKnight* bag_knight;
-    BaseItem* head = nullptr;
+    BaseItem* head = NULL;
     int bag_num_now = 0;
     int max_bag;
 
@@ -40,6 +40,10 @@ public:
 
     void setNumBag(int n) {
         bag_num_now += n;
+    }
+
+    int getNumBag() {
+        return bag_num_now;
     }
     
     
